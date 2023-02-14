@@ -1,0 +1,501 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: dkube-titanic-pl-
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.8.9, pipelines.kubeflow.org/pipeline_compilation_time: '2023-02-13T12:04:06.116489',
+    pipelines.kubeflow.org/pipeline_spec: '{"description": "sample titanic pipeline
+      with dkube components", "inputs": [{"name": "token"}, {"name": "E"}], "name":
+      "dkube-titanic-pl"}'}
+  labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.8.9}
+spec:
+  entrypoint: dkube-titanic-pl
+  templates:
+  - name: dkube-preprocess
+    container:
+      args: [preprocess, --accessurl, '', --token, '{{inputs.parameters.token}}',
+        --container, '{"image": "docker.io/ocdr/dkube-datascience-tf-cpu:v2.0.0-3"}',
+        --script, pip3 install pymysql --user;python titanic_datasources/preprocessing.py
+          --data_source local --train_type training --monitor_name titanic-mm-local
+          --user ocdkube, --program, monitoring-examples, --commit_id, '', --datasets,
+        '["titanic-data"]', --input_dataset_mounts, '["/data"]', --input_dataset_versions,
+        '[]', --input_featuresets, '[]', --input_featureset_mounts, '[]', --input_featureset_versions,
+        '[]', --models, '[]', --input_model_mounts, '[]', --input_model_versions,
+        '[]', --outputs, '["titanic-training-data"]', --output_mounts, '["/train-data"]',
+        --output_featuresets, --output_featureset_mounts, --ngpus, '0', --config,
+        '', --envs, '[]', --job_group, default, --tags, '[]', --runid, '{{pod.name}}',
+        --wfid, '{{workflow.uid}}']
+      command: [dkubepl]
+      image: ocdr/dkubepl:3.8
+    inputs:
+      parameters:
+      - {name: token}
+    outputs:
+      artifacts:
+      - {name: dkube-preprocess-artifact, path: /tmp/artifact}
+      - {name: dkube-preprocess-rundetails, path: /tmp/rundetails}
+    metadata:
+      annotations: {platform: Dkube, pipelines.kubeflow.org/task_display_name: data-generation,
+        pipelines.kubeflow.org/component_spec: '{"description": "Component which can
+          be used to perform data preprocessing on Dkube platform.\nDkube preprocess
+          provides,\n* Ability to orchestrate and run custom containers.\n* Renders
+          utilization graphs for CPU, Memory.\n* Tags to group related preprocessing
+          jobs.\n", "implementation": {"container": {"args": ["preprocess", "--accessurl",
+          {"inputValue": "access_url"}, "--token", {"inputValue": "auth_token"}, "--container",
+          {"inputValue": "container"}, "--script", {"inputValue": "run_script"}, "--program",
+          {"inputValue": "program"}, "--commit_id", {"inputValue": "commit_id"}, "--datasets",
+          {"inputValue": "datasets"}, "--input_dataset_mounts", {"inputValue": "input_dataset_mounts"},
+          "--input_dataset_versions", {"inputValue": "input_dataset_versions"}, "--input_featuresets",
+          {"inputValue": "input_featuresets"}, "--input_featureset_mounts", {"inputValue":
+          "input_featureset_mounts"}, "--input_featureset_versions", {"inputValue":
+          "input_featureset_versions"}, "--models", {"inputValue": "models"}, "--input_model_mounts",
+          {"inputValue": "input_model_mounts"}, "--input_model_versions", {"inputValue":
+          "input_model_versions"}, "--outputs", {"inputValue": "outputs"}, "--output_mounts",
+          {"inputValue": "output_mounts"}, "--output_featuresets", {"inputValue":
+          "output_featuresets"}, "--output_featureset_mounts", {"inputValue": "output_featureset_mounts"},
+          "--ngpus", {"inputValue": "ngpus"}, "--config", {"inputValue": "config"},
+          "--envs", {"inputValue": "envs"}, "--job_group", {"inputValue": "job_group"},
+          "--tags", {"inputValue": "tags"}, "--runid", "{{pod.name}}", "--wfid", "{{workflow.uid}}"],
+          "command": ["dkubepl"], "fileOutputs": {"artifact": "/tmp/artifact", "rundetails":
+          "/tmp/rundetails"}, "image": "ocdr/dkubepl:3.8"}}, "inputs": [{"description":
+          "Deprecated. Dkube authentication token.", "name": "auth_token", "optional":
+          true, "type": "String"}, {"description": "Required. Container to use for
+          preprocessing. Format: {\"image\":<url>, \"username\":<>, \"password\":<>}",
+          "name": "container", "optional": true, "type": "Dict"}, {"default": "",
+          "description": "Optional. Program imported in Dkube to be run inside container.
+          If not specified container should have entrypoint.", "name": "program",
+          "optional": true, "type": "String"}, {"default": "", "description": "Optional.
+          Program commit ID. If not provided, dkube takes the latest commit.", "name":
+          "commit_id", "optional": true, "type": "String"}, {"default": "", "description":
+          "Optional. Script to run the program. If not specified container should
+          have entrypoint.", "name": "run_script", "optional": true, "type": "String"},
+          {"default": "[]", "description": "Optional. List of input datasets required
+          for preprocessing. These datasets must be created in Dkube.", "name": "datasets",
+          "optional": true, "type": "List"}, {"default": "[]", "description": "Optional.
+          List of input datasets mount paths.", "name": "input_dataset_mounts", "optional":
+          true, "type": "List"}, {"default": "[]", "description": "Optional. List
+          of input datasets versions.", "name": "input_dataset_versions", "optional":
+          true, "type": "List"}, {"default": "[]", "description": "Optional. List
+          of input featuresets required for preprocessing. These featuresets must
+          be created in Dkube.", "name": "input_featuresets", "optional": true, "type":
+          "List"}, {"default": "[]", "description": "Optional. List of input featuresets
+          mount paths.", "name": "input_featureset_mounts", "optional": true, "type":
+          "List"}, {"default": "[]", "description": "Optional. List of input featureset
+          versions.", "name": "input_featureset_versions", "optional": true, "type":
+          "List"}, {"default": "[]", "description": "Optional. List of input models
+          required for preprocessing. These models must be created in Dkube.", "name":
+          "models", "optional": true, "type": "List"}, {"default": "[]", "description":
+          "Optional. List of input models mount paths.", "name": "input_model_mounts",
+          "optional": true, "type": "List"}, {"default": "[]", "description": "Optional.
+          List of input models versions.", "name": "input_model_versions", "optional":
+          true, "type": "List"}, {"default": "[]", "description": "Required. List
+          of output datasets of a datajob", "name": "outputs", "optional": true, "type":
+          "List"}, {"default": "[]", "description": "Required. List of output datasets
+          mount paths", "name": "output_mounts", "optional": true, "type": "List"},
+          {"description": "Required. List of output featuresets of a datajob", "name":
+          "output_featuresets", "optional": true, "type": "List"}, {"description":
+          "Required. List of output featuresets mount paths", "name": "output_featureset_mounts",
+          "optional": true, "type": "List"}, {"default": 0, "description": "Optional.
+          Number of gpus the training program should use.", "name": "ngpus", "optional":
+          true, "type": "Integer"}, {"default": "", "description": "Optional. HP file
+          or configuration data required for training program. Supported inputs -
+          d3s://<path> - Path to a file in dkube storage. <string> - Inline data",
+          "name": "config", "optional": true, "type": "String"}, {"default": "[]",
+          "description": "Optional. Environments for preprocess program. Exact key
+          value will be made available for the container", "name": "envs", "optional":
+          true, "type": "List"}, {"default": "", "description": "Optional. URL at
+          which dkube is accessible, copy paste from the browser of this window. Required
+          for cloud deployments.", "name": "access_url", "optional": true, "type":
+          "String"}, {"default": "default", "description": "Optional. Runs can be
+          organized into Groups that allow them to be viewed together. This group
+          must be created in Dkube.", "name": "job_group", "optional": true, "type":
+          "String"}, {"default": "[]", "description": "Optional. List of user-chosen
+          tags to allow Runs to be better identified or grouped.", "name": "tags",
+          "optional": true, "type": "List"}], "metadata": {"annotations": {"platform":
+          "Dkube"}, "labels": {"logger": "dkubepl", "platform": "Dkube", "runid":
+          "{{pod.name}}", "stage": "preprocess", "wfid": "{{workflow.uid}}"}}, "name":
+          "dkube-preprocess", "outputs": [{"description": "Details of the dkube run",
+          "name": "rundetails"}, {"description": "Identifier in Dkube storage where
+          artifact generated by this component are stored.", "name": "artifact"}]}',
+        pipelines.kubeflow.org/component_ref: '{"digest": "0d2b2bbecedc8033900dc5b3a1c7f5b483d084a5418d680af49878e3a5adf7a8",
+          "url": "/mnt/dkube/pipeline/components/preprocess/component.yaml"}', pipelines.kubeflow.org/arguments.parameters: '{"access_url":
+          "", "auth_token": "{{inputs.parameters.token}}", "commit_id": "", "config":
+          "", "container": "{\"image\": \"docker.io/ocdr/dkube-datascience-tf-cpu:v2.0.0-3\"}",
+          "datasets": "[\"titanic-data\"]", "envs": "[]", "input_dataset_mounts":
+          "[\"/data\"]", "input_dataset_versions": "[]", "input_featureset_mounts":
+          "[]", "input_featureset_versions": "[]", "input_featuresets": "[]", "input_model_mounts":
+          "[]", "input_model_versions": "[]", "job_group": "default", "models": "[]",
+          "ngpus": "0", "output_mounts": "[\"/train-data\"]", "outputs": "[\"titanic-training-data\"]",
+          "program": "monitoring-examples", "run_script": "pip3 install pymysql --user;python
+          titanic_datasources/preprocessing.py --data_source local --train_type training
+          --monitor_name titanic-mm-local --user ocdkube", "tags": "[]"}'}
+      labels:
+        platform: Dkube
+        logger: dkubepl
+        wfid: '{{workflow.uid}}'
+        runid: '{{pod.name}}'
+        stage: preprocess
+        pipelines.kubeflow.org/kfp_sdk_version: 1.8.9
+        pipelines.kubeflow.org/pipeline-sdk-type: kfp
+        pipelines.kubeflow.org/enable_caching: "true"
+  - name: dkube-serving
+    container:
+      args:
+      - serving
+      - --accessurl
+      - ''
+      - --token
+      - '{{inputs.parameters.token}}'
+      - --model
+      - '{{inputs.parameters.dkube-training-artifact}}'
+      - --name
+      - --model_version
+      - --device
+      - cpu
+      - --production
+      - "false"
+      - --update
+      - "false"
+      - --serving_image
+      - '{"image": "ocdr/tensorflowserver:2.0.0"}'
+      - --transformer_image
+      - '{"image": "ocdr/dkube-datascience-tf-cpu:v2.0.0"}'
+      - --transformer_project
+      - monitoring-examples
+      - --transformer_code
+      - titanic_datasources/transformer.py
+      - --transformer_commit_id
+      - --min_replicas
+      - --max_concurrent_requests
+      - --envs
+      - '[]'
+      - --min_cpu
+      - --max_cpu
+      - --min_memory
+      - --max_memory
+      - --runid
+      - '{{pod.name}}'
+      - --wfid
+      - '{{workflow.uid}}'
+      command: [dkubepl]
+      image: ocdr/dkubepl:3.8
+    inputs:
+      parameters:
+      - {name: dkube-training-artifact}
+      - {name: token}
+    outputs:
+      artifacts:
+      - {name: dkube-serving-rundetails, path: /tmp/rundetails}
+      - {name: dkube-serving-servingurl, path: /tmp/servingurl}
+    metadata:
+      annotations: {platform: Dkube, pipelines.kubeflow.org/component_spec: '{"description":
+          "Component which can be used to deploy a trained model on Dkube platform.\nDkube
+          serving provides,\n* Option to deploy with CPU/GPU.\n* A web server in the
+          front and all the required infra to access the server.\n* Deployed as microserice.
+          Serving URL is provided for any other application logic to consume the model.\n*
+          Attempts to decode and present some abstract information about the model.\n",
+          "implementation": {"container": {"args": ["serving", "--accessurl", {"inputValue":
+          "access_url"}, "--token", {"inputValue": "auth_token"}, "--model", {"inputValue":
+          "model"}, "--name", {"inputValue": "name"}, "--model_version", {"inputValue":
+          "model_version"}, "--device", {"inputValue": "device"}, "--production",
+          {"inputValue": "production"}, "--update", {"inputValue": "update"}, "--serving_image",
+          {"inputValue": "serving_image"}, "--transformer_image", {"inputValue": "transformer_image"},
+          "--transformer_project", {"inputValue": "transformer_project"}, "--transformer_code",
+          {"inputValue": "transformer_code"}, "--transformer_commit_id", {"inputValue":
+          "transformer_commit_id"}, "--min_replicas", {"inputValue": "min_replicas"},
+          "--max_concurrent_requests", {"inputValue": "max_concurrent_requests"},
+          "--envs", {"inputValue": "envs"}, "--min_cpu", {"inputValue": "min_cpu"},
+          "--max_cpu", {"inputValue": "max_cpu"}, "--min_memory", {"inputValue": "min_memory"},
+          "--max_memory", {"inputValue": "max_memory"}, "--runid", "{{pod.name}}",
+          "--wfid", "{{workflow.uid}}"], "command": ["dkubepl"], "fileOutputs": {"rundetails":
+          "/tmp/rundetails", "servingurl": "/tmp/servingurl"}, "image": "ocdr/dkubepl:3.8"}},
+          "inputs": [{"description": "Deprecated. Dkube authentication token.", "name":
+          "auth_token", "optional": true, "type": "String"}, {"description": "Required.
+          Trained model in Dkube which is to be deployed for serving.", "name": "model",
+          "optional": true, "type": "String"}, {"description": "Optional. Name of
+          deployment.", "name": "name", "optional": true, "type": "String"}, {"description":
+          "Optional. Trained model version.", "name": "model_version", "optional":
+          true, "type": "String"}, {"default": "cpu", "description": "Optional. Device
+          to use for serving - allowed values, gpu/cpu/auto.", "name": "device", "optional":
+          true, "type": "String"}, {"default": "", "description": "Optional. URL at
+          which dkube is accessible, copy paste from the browser of this window. Required
+          for cloud deployments.", "name": "access_url", "optional": true, "type":
+          "String"}, {"description": "Required. Container to use for serving. Format:
+          {\"image\":<url>, \"username\":<>, \"password\":<>}", "name": "serving_image",
+          "optional": true, "type": "Dict"}, {"description": "Required. Container
+          to use as transformer. Format: {\"image\":<url>, \"username\":<>, \"password\":<>}",
+          "name": "transformer_image", "optional": true, "type": "Dict"}, {"description":
+          "Required. Transformer project.", "name": "transformer_project", "optional":
+          true, "type": "String"}, {"description": "Required. Transformer script.",
+          "name": "transformer_code", "optional": true, "type": "String"}, {"description":
+          "Optional. Transformer project commit ID.", "name": "transformer_commit_id",
+          "optional": true, "type": "String"}, {"description": "Optional. Minimum
+          number of replicas that each Revision should have. If not provided, value
+          from platform config will be used.", "name": "min_replicas", "optional":
+          true, "type": "String"}, {"description": "Optional. Maximum number of requests
+          an inf pod can process at a time. If not provided, value from platform config
+          will be used.", "name": "max_concurrent_requests", "optional": true, "type":
+          "String"}, {"default": "false", "description": "Set the value to true for
+          production deployment.", "name": "production", "optional": true, "type":
+          "String"}, {"default": "false", "description": "Set the value to true for
+          updating an existing deployment. All fields must me filled in this case.",
+          "name": "update", "optional": true, "type": "String"}, {"default": "[]",
+          "description": "Optional. Environments for serving program. Exact key value
+          will be made available for the container", "name": "envs", "optional": true,
+          "type": "List"}, {"description": "Specify minimum CPU requirement, e.g 1
+          (cpu) or 100m (millicpu)", "name": "min_cpu", "optional": true, "type":
+          "String"}, {"description": "Specify maximum CPU requirement, e.g 2 (cpu)
+          or 200m (millicpu)", "name": "max_cpu", "optional": true, "type": "String"},
+          {"description": "Specify minimum memory requirement. For example 128974848,
+          129e6, 129M, 123Mi.", "name": "min_memory", "optional": true, "type": "String"},
+          {"description": "Specify maximum memory requirement. For example 128974848,
+          129e6, 129M, 123Mi.", "name": "max_memory", "optional": true, "type": "String"}],
+          "metadata": {"annotations": {"platform": "Dkube"}, "labels": {"logger":
+          "dkubepl", "platform": "Dkube", "runid": "{{pod.name}}", "stage": "serving",
+          "wfid": "{{workflow.uid}}"}}, "name": "dkube-serving", "outputs": [{"description":
+          "Details of the dkube run", "name": "rundetails"}, {"description": "URL
+          at which the serving web server is accessible.", "name": "servingurl"}]}',
+        pipelines.kubeflow.org/component_ref: '{"digest": "232e3977da79ee799df16c433a8462740da17a9dd3f7fe3805dd4b88df8e8212",
+          "url": "/mnt/dkube/pipeline/components/serving/component.yaml"}', pipelines.kubeflow.org/arguments.parameters: '{"access_url":
+          "", "auth_token": "{{inputs.parameters.token}}", "device": "cpu", "envs":
+          "[]", "model": "{{inputs.parameters.dkube-training-artifact}}", "production":
+          "false", "serving_image": "{\"image\": \"ocdr/tensorflowserver:2.0.0\"}",
+          "transformer_code": "titanic_datasources/transformer.py", "transformer_image":
+          "{\"image\": \"ocdr/dkube-datascience-tf-cpu:v2.0.0\"}", "transformer_project":
+          "monitoring-examples", "update": "false"}'}
+      labels:
+        platform: Dkube
+        logger: dkubepl
+        wfid: '{{workflow.uid}}'
+        runid: '{{pod.name}}'
+        stage: serving
+        pipelines.kubeflow.org/kfp_sdk_version: 1.8.9
+        pipelines.kubeflow.org/pipeline-sdk-type: kfp
+        pipelines.kubeflow.org/enable_caching: "true"
+  - name: dkube-titanic-pl
+    inputs:
+      parameters:
+      - {name: E}
+      - {name: token}
+    dag:
+      tasks:
+      - name: dkube-preprocess
+        template: dkube-preprocess
+        arguments:
+          parameters:
+          - {name: token, value: '{{inputs.parameters.token}}'}
+      - name: dkube-serving
+        template: dkube-serving
+        dependencies: [dkube-training]
+        arguments:
+          parameters:
+          - {name: dkube-training-artifact, value: '{{tasks.dkube-training.outputs.parameters.dkube-training-artifact}}'}
+          - {name: token, value: '{{inputs.parameters.token}}'}
+      - name: dkube-training
+        template: dkube-training
+        dependencies: [dkube-preprocess]
+        arguments:
+          parameters:
+          - {name: E, value: '{{inputs.parameters.E}}'}
+          - {name: token, value: '{{inputs.parameters.token}}'}
+  - name: dkube-training
+    container:
+      args:
+      - training
+      - --accessurl
+      - ''
+      - --token
+      - '{{inputs.parameters.token}}'
+      - --container
+      - '{"image": "docker.io/ocdr/dkube-datascience-tf-cpu:v2.0.0-3"}'
+      - --script
+      - python titanic_datasources/training.py --data_source local
+      - --program
+      - monitoring-examples
+      - --commit_id
+      - ''
+      - --datasets
+      - '["titanic-training-data"]'
+      - --input_dataset_mounts
+      - '["/train-data"]'
+      - --input_dataset_versions
+      - '[]'
+      - --input_featuresets
+      - '[]'
+      - --input_featureset_mounts
+      - '[]'
+      - --input_featureset_versions
+      - '[]'
+      - --models
+      - '[]'
+      - --input_model_mounts
+      - '[]'
+      - --input_model_versions
+      - '[]'
+      - --outputs
+      - '["titanic-model"]'
+      - --output_mounts
+      - '["/model"]'
+      - --ngpus
+      - '0'
+      - --nworkers
+      - '0'
+      - --auto
+      - "false"
+      - --config
+      - ''
+      - --tuning
+      - ''
+      - --envs
+      - '[{"EPOCHS": "{{inputs.parameters.E}}"}]'
+      - --gdrdma
+      - "false"
+      - --job_group
+      - default
+      - --framework
+      - tensorflow
+      - --version
+      - 2.0.0
+      - --tags
+      - '[]'
+      - --runid
+      - '{{pod.name}}'
+      - --wfid
+      - '{{workflow.uid}}'
+      command: [dkubepl]
+      image: ocdr/dkubepl:3.8
+    inputs:
+      parameters:
+      - {name: E}
+      - {name: token}
+    outputs:
+      parameters:
+      - name: dkube-training-artifact
+        valueFrom: {path: /tmp/artifact}
+      artifacts:
+      - {name: dkube-training-artifact, path: /tmp/artifact}
+      - {name: dkube-training-rundetails, path: /tmp/rundetails}
+    metadata:
+      annotations: {platform: Dkube, pipelines.kubeflow.org/component_spec: '{"description":
+          "Component which can be used to do training for deep learning models on
+          Dkube platform.\nDkube training offers,\n* Advanced options for distributed
+          training, gpu managment & pooling.\n* Support Hyper parameter tuning.\n*
+          GDRDMA support for Horovod like training programs.\n* Ability to orchestrate
+          and run custom training containers, prebuilt dkube datascience containers
+          can also be used.\n* Renders nice Dashboard for training metrics and utilization
+          graphs for GPU, CPU, Memory.\n* Support for early stopping if program is
+          not converging - User can abort the Job and resume from previous point in
+          training.\n* Tags to group related training jobs.\n", "implementation":
+          {"container": {"args": ["training", "--accessurl", {"inputValue": "access_url"},
+          "--token", {"inputValue": "auth_token"}, "--container", {"inputValue": "container"},
+          "--script", {"inputValue": "run_script"}, "--program", {"inputValue": "program"},
+          "--commit_id", {"inputValue": "commit_id"}, "--datasets", {"inputValue":
+          "datasets"}, "--input_dataset_mounts", {"inputValue": "input_dataset_mounts"},
+          "--input_dataset_versions", {"inputValue": "input_dataset_versions"}, "--input_featuresets",
+          {"inputValue": "featuresets"}, "--input_featureset_mounts", {"inputValue":
+          "input_featureset_mounts"}, "--input_featureset_versions", {"inputValue":
+          "input_featureset_versions"}, "--models", {"inputValue": "models"}, "--input_model_mounts",
+          {"inputValue": "input_model_mounts"}, "--input_model_versions", {"inputValue":
+          "input_model_versions"}, "--outputs", {"inputValue": "outputs"}, "--output_mounts",
+          {"inputValue": "output_mounts"}, "--ngpus", {"inputValue": "ngpus"}, "--nworkers",
+          {"inputValue": "nworkers"}, "--auto", {"inputValue": "auto_distribute"},
+          "--config", {"inputValue": "config"}, "--tuning", {"inputValue": "tuning"},
+          "--envs", {"inputValue": "envs"}, "--gdrdma", {"inputValue": "gdrdma"},
+          "--job_group", {"inputValue": "job_group"}, "--framework", {"inputValue":
+          "framework"}, "--version", {"inputValue": "version"}, "--tags", {"inputValue":
+          "tags"}, "--runid", "{{pod.name}}", "--wfid", "{{workflow.uid}}"], "command":
+          ["dkubepl"], "fileOutputs": {"artifact": "/tmp/artifact", "rundetails":
+          "/tmp/rundetails"}, "image": "ocdr/dkubepl:3.8"}}, "inputs": [{"description":
+          "Deprecated. Dkube authentication token.", "name": "auth_token", "optional":
+          true, "type": "String"}, {"description": "Required. Container to use for
+          training. Format: {\"image\":<url>, \"username\":<>, \"password\":<>}",
+          "name": "container", "optional": true, "type": "Dict"}, {"default": "",
+          "description": "Optional. Program imported in Dkube to be run inside container.
+          If not specified container should have entrypoint.", "name": "program",
+          "optional": true, "type": "String"}, {"default": "", "description": "Optional.
+          Program commit ID. If not provided, dkube takes the latest commit.", "name":
+          "commit_id", "optional": true, "type": "String"}, {"default": "", "description":
+          "Optional. Script to run the program. If not specified container should
+          have entrypoint.", "name": "run_script", "optional": true, "type": "String"},
+          {"default": "[]", "description": "Optional. List of input datasets required
+          for training. These datasets must be created in Dkube.", "name": "datasets",
+          "optional": true, "type": "List"}, {"default": "[]", "description": "Optional.
+          List of input datasets mount paths.", "name": "input_dataset_mounts", "optional":
+          true, "type": "List"}, {"default": "[]", "description": "Optional. List
+          of input datasets versions.", "name": "input_dataset_versions", "optional":
+          true, "type": "List"}, {"default": "[]", "description": "Optional. List
+          of input featuresets required for training. These featuresets must be created
+          in Dkube.", "name": "featuresets", "optional": true, "type": "List"}, {"default":
+          "[]", "description": "Optional. List of input featureset mount paths.",
+          "name": "input_featureset_mounts", "optional": true, "type": "List"}, {"default":
+          "[]", "description": "Optional. List of input featureset versions.", "name":
+          "input_featureset_versions", "optional": true, "type": "List"}, {"default":
+          "[]", "description": "Optional. List of input models required for training.
+          These models must be created in Dkube.", "name": "models", "optional": true,
+          "type": "List"}, {"default": "[]", "description": "Optional. List of input
+          models mount paths.", "name": "input_model_mounts", "optional": true, "type":
+          "List"}, {"default": "[]", "description": "Optional. List of input models
+          mount versions.", "name": "input_model_versions", "optional": true, "type":
+          "List"}, {"default": "[]", "description": "Required. List of output models
+          of a training", "name": "outputs", "optional": true, "type": "List"}, {"default":
+          "[]", "description": "Required. List of output model mount paths", "name":
+          "output_mounts", "optional": true, "type": "List"}, {"default": 0, "description":
+          "Optional. Number of gpus the training program should use.", "name": "ngpus",
+          "optional": true, "type": "Integer"}, {"default": 0, "description": "Optional.
+          Number of workers for training, >0 for distributed training.", "name": "nworkers",
+          "optional": true, "type": "Integer"}, {"default": "false", "description":
+          "Optional. Should Dkube auto distribute based on available number of resources.",
+          "name": "auto_distribute", "optional": true, "type": "String"}, {"default":
+          "", "description": "Optional. HP file or configuration data required for
+          training program. Supported inputs - d3s://<path> - Path to a file in dkube
+          storage. <string> - Inline data", "name": "config", "optional": true, "type":
+          "String"}, {"default": "", "description": "Optional. HP tuning information.
+          Can be a URL to a file with hptuning definition or inline data. Supported
+          inputs - d3s://<path> - Path to a file in dkube storage. <string> - Inline
+          data, only json formatted string is valid.", "name": "tuning", "optional":
+          true, "type": "String"}, {"default": "[]", "description": "Optional. Environments
+          for training program. Exact key value will be made available for the container",
+          "name": "envs", "optional": true, "type": "List"}, {"default": "false",
+          "description": "Optional. Whether to use GDRDMA for distributed training.",
+          "name": "gdrdma", "optional": true, "type": "String"}, {"default": "", "description":
+          "Optional. URL at which dkube is accessible, copy paste from the browser
+          of this window. Required for cloud deployments.", "name": "access_url",
+          "optional": true, "type": "String"}, {"default": "default", "description":
+          "Optional. Runs can be organized into Groups that allow them to be viewed
+          together. This group must be created in Dkube.", "name": "job_group", "optional":
+          true, "type": "String"}, {"description": "Required. Framework {tensorflow,
+          pytorch, sklearn, custom...}.", "name": "framework", "optional": true, "type":
+          "String"}, {"description": "Required. Framework version.", "name": "version",
+          "optional": true, "type": "String"}, {"default": "[]", "description": "Optional.
+          List of user-chosen tags to allow Runs to be better identified or grouped.",
+          "name": "tags", "optional": true, "type": "List"}], "metadata": {"annotations":
+          {"platform": "Dkube"}, "labels": {"logger": "dkubepl", "platform": "Dkube",
+          "runid": "{{pod.name}}", "stage": "training", "wfid": "{{workflow.uid}}"}},
+          "name": "dkube-training", "outputs": [{"description": "Details of the dkube
+          run", "name": "rundetails"}, {"description": "Identifier in Dkube storage
+          where artifacts of training are stored.", "name": "artifact"}]}', pipelines.kubeflow.org/component_ref: '{"digest":
+          "67a48966b44edd6a096105a0d368c939895dbf6074ef177bc3d48605b2b42ba9", "url":
+          "/mnt/dkube/pipeline/components/training/component.yaml"}', pipelines.kubeflow.org/arguments.parameters: '{"access_url":
+          "", "auth_token": "{{inputs.parameters.token}}", "auto_distribute": "false",
+          "commit_id": "", "config": "", "container": "{\"image\": \"docker.io/ocdr/dkube-datascience-tf-cpu:v2.0.0-3\"}",
+          "datasets": "[\"titanic-training-data\"]", "envs": "[{\"EPOCHS\": \"{{inputs.parameters.E}}\"}]",
+          "featuresets": "[]", "framework": "tensorflow", "gdrdma": "false", "input_dataset_mounts":
+          "[\"/train-data\"]", "input_dataset_versions": "[]", "input_featureset_mounts":
+          "[]", "input_featureset_versions": "[]", "input_model_mounts": "[]", "input_model_versions":
+          "[]", "job_group": "default", "models": "[]", "ngpus": "0", "nworkers":
+          "0", "output_mounts": "[\"/model\"]", "outputs": "[\"titanic-model\"]",
+          "program": "monitoring-examples", "run_script": "python titanic_datasources/training.py
+          --data_source local", "tags": "[]", "tuning": "", "version": "2.0.0"}'}
+      labels:
+        platform: Dkube
+        logger: dkubepl
+        wfid: '{{workflow.uid}}'
+        runid: '{{pod.name}}'
+        stage: training
+        pipelines.kubeflow.org/kfp_sdk_version: 1.8.9
+        pipelines.kubeflow.org/pipeline-sdk-type: kfp
+        pipelines.kubeflow.org/enable_caching: "true"
+  arguments:
+    parameters:
+    - {name: token}
+    - {name: E}
+  serviceAccountName: pipeline-runner
